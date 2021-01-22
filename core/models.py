@@ -57,6 +57,7 @@ class Step(models.Model):
     step_time = models.IntegerField(verbose_name='Время шага', blank=True, default='')
     transaction = models.ManyToManyField(Transaction, related_name='gamestep')
 
+
 class GameSetting(models.Model):
     manufacturer_balance = models.IntegerField(verbose_name='Баланс производителя')
     broker_balance = models.IntegerField(verbose_name="Баланс маклера")
@@ -69,3 +70,6 @@ class Game(models.Model):
     settings = models.ForeignKey(GameSetting, related_name='settings', on_delete=models.SET_NULL, null=True)
     step = models.ManyToManyField(Step, related_name='gamestep')
     user = models.ManyToManyField(Profile, verbose_name='Профиль игрока', related_name='profile')
+    name = models.CharField(max_length=255, verbose_name='Имя игры', blank=True)
+    game_status = models.BooleanField(default=True, verbose_name='Статус игры')
+    game_start = models.BooleanField(default=False, verbose_name='Старт игры')

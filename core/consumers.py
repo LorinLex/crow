@@ -4,8 +4,69 @@ from collections import defaultdict
 import weakref
 import json
 
+from .services.model_extract_services import get_all_games
+
 
 class GameConsumer(WebsocketConsumer):
+    __refs__ = defaultdict(list)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__refs__[self.__class__].append(weakref.ref(self))
+
+    @classmethod
+    def get_instances(cls):
+        for inst_ref in cls.__refs__[cls]:
+            inst = inst_ref()
+            if inst is not None:
+                yield inst
+
+    def connect(self):
+        self.room_group_name = 'game'
+
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        self.accept()
+
+    def disconnect(self, close_code):
+        # Leave room group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    # Receive message from WebSocket
+    def receive(self, text_data):
+        input('recive')
+        print(json.loads(text_data)['type'])
+        # Send message to room group
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'change',
+                'game': text_data
+            }
+        )
+
+    # Receive message from room group
+    def change(self, message):
+        input('change')
+        print(message)
+        # Send message to WebSocket
+
+        self.send(text_data=json.dumps({
+            'change': message
+        }))
+
+    def getter(self):
+        self.receive(get_all_games())
+
+
+class GameDetailConsumer(WebsocketConsumer):
     __refs__ = defaultdict(list)
 
     def __init__(self, *args, **kwargs):
@@ -60,5 +121,4 @@ class GameConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'message': message
         }))
-
 

@@ -13,3 +13,5 @@ def get_socket_obj(id):
 def get_game_socket(game_id: str):
     """:return Объект сокета игры"""
     return get_socket_obj(game_id)
+
+
