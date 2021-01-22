@@ -5,6 +5,7 @@ import weakref
 import json
 
 from .services.model_extract_services import get_all_games
+from .services.websocket_services.router import rout
 
 
 class GameConsumer(WebsocketConsumer):
@@ -41,29 +42,28 @@ class GameConsumer(WebsocketConsumer):
 
     # Receive message from WebSocket
     def receive(self, text_data):
-        input('recive')
-        print(json.loads(text_data)['type'])
-        # Send message to room group
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-            {
-                'type': 'change',
-                'game': text_data
-            }
-        )
+        data, send_type = rout(text_data)
+        if send_type == 'send_all':
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': send_type,
+                    'data': data
+                }
+            )
+        if send_type == 'send_me':
+            self.send(text_data=json.dumps({
+                'type': send_type,
+                'data': data
+            }))
 
     # Receive message from room group
-    def change(self, message):
-        input('change')
-        print(message)
+    def send_all(self, message):
         # Send message to WebSocket
-
         self.send(text_data=json.dumps({
-            'change': message
+            'type': 'message',
+            'data': message
         }))
-
-    def getter(self):
-        self.receive(get_all_games())
 
 
 class GameDetailConsumer(WebsocketConsumer):

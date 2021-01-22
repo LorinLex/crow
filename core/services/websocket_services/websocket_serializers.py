@@ -11,6 +11,7 @@ class WSGameSettingSerializer(serializers.ModelSerializer):
 
 class WSGameSerializer(serializers.ModelSerializer):
     '''Сериализатор для игор'''
+    players_quantity = serializers.IntegerField()
     settings = WSGameSettingSerializer()
 
     class Meta:
