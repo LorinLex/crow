@@ -89,11 +89,15 @@ class Player(models.Model):
 
 
 class Production(models.Model):
-    manufacturer = models.ForeignKey(Player, on_delete=models.SET_NULL, null=True)
+    manufacturer = models.ForeignKey(Player, on_delete=models.SET_NULL, null=True, related_name='production')
     billets_produced = models.IntegerField()
 
     def __str__(self):
         return f'Запрос на производство игрока {self.manufacturer.nickname}'
+
+    class Meta:
+        verbose_name = 'Запрос на производство'
+        verbose_name_plural = 'Запросы на производство'
 
 
 class Warehouse(models.Model):
@@ -103,12 +107,13 @@ class Warehouse(models.Model):
     def __str__(self):
         return f'Склад игрока {self.player.nickname}'
 
+
 class Turn(models.Model):
     """Модель хода"""
     turn_time = models.IntegerField(verbose_name='Время хода', blank=True, default='')
 
     def __str__(self):
-        return f'Ход № {self.pk + 1}'
+        return f'Ход № {self.pk}'
 
     class Meta:
         verbose_name = 'Ход'
@@ -117,10 +122,10 @@ class Turn(models.Model):
 
 class Transaction(models.Model):
     """Модель транзакции"""
-    manufacturer = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='transaction')
-    broker = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='broker')
+    manufacturer = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='transaction_m')
+    broker = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='transaction_b')
     number_of_billets = models.IntegerField(verbose_name='Количество')
-    billet_price = models.IntegerField(verbose_name="Цена сделки")
+    billet_price = models.IntegerField(verbose_name="Цена за заготовку")
     costs_transporting_single = models.PositiveIntegerField(default=10)
     approved_by_broker = models.BooleanField(default=False)
     turn = models.ForeignKey(Turn, on_delete=models.CASCADE, related_name='transaction', default='')
