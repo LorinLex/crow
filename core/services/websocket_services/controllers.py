@@ -2,13 +2,13 @@ import json
 
 from django.db import models
 
-from ...models import Game, GameSetting
-from .websocket_serializers import WSGameSerializer
+from ...models import Session, GameSetting
+from .websocket_serializers import WSSessionSerializer
 
 
 def get_game_controller(obj: object):
-    queryset = Game.objects.filter(game_status=True).annotate(players_quantity=models.Count('user'))
-    data = json.dumps(WSGameSerializer(queryset, many=True).data)
+    queryset = Session.objects.exclude(status='Filled').annotate(players_quantity=models.Count('player'))
+    data = json.dumps(WSSessionSerializer(queryset, many=True).data)
     obj.send(
         text_data=json.dumps({
             'type': 'games',
