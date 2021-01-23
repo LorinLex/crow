@@ -1,13 +1,21 @@
 from rest_framework.viewsets import ModelViewSet
 
-from .models import  GameSetting, MainUser,  Transaction
+from .models import  GameSetting, MainUser,  Transaction, Session
 from .serializers import GameSettingSerializer, MainUserDetailSerializer, \
-    TransactionSerializer
+    TransactionSerializer, SessionSerializer
 
 
 class GameSettingViewSet(ModelViewSet):
+    """Вывод настроек игры"""
+    # FIXME посмотреть get serializer
     queryset = GameSetting.objects.all()
     serializer_class = GameSettingSerializer
+
+
+class SessionViewSet(ModelViewSet):
+    """Вывод игровых ссесий"""
+    queryset = Session.objects.exclude(status='Filled')
+    serializer_class = SessionSerializer
 
 
 class UserViewSet(ModelViewSet):

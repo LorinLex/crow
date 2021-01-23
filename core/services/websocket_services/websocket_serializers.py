@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ...models import Game, GameSetting
+from ...models import Session, GameSetting
 
 
 class WSGameSettingSerializer(serializers.ModelSerializer):
@@ -9,11 +9,11 @@ class WSGameSettingSerializer(serializers.ModelSerializer):
         fields = ('crow_balance', )
 
 
-class WSGameSerializer(serializers.ModelSerializer):
+class WSSessionSerializer(serializers.ModelSerializer):
     '''Сериализатор для игор'''
     players_quantity = serializers.IntegerField()
     settings = WSGameSettingSerializer()
 
     class Meta:
-        model = Game
+        model = Session
         fields = ("id", 'name', 'turn_count', 'settings', 'players_quantity')
