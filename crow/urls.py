@@ -24,7 +24,6 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from core.views import GameViewSet, GameSettingViewSet, ProfileViewSet, TransactionViewSet
 
 
 schema_view = get_schema_view(
@@ -42,11 +41,6 @@ schema_view = get_schema_view(
 
 
 router = SimpleRouter()
-
-router.register(r'game', GameViewSet)
-router.register(r'settings', GameSettingViewSet)
-router.register(r'profile', ProfileViewSet)
-router.register(r'transaction', TransactionViewSet)
 
 
 urlpatterns = [

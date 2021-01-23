@@ -4,8 +4,7 @@ from collections import defaultdict
 import weakref
 import json
 
-from .services.model_extract_services import get_all_games
-from .services.websocket_services.router import rout
+from .services.websocket_services.controllers import get_game_controller
 
 
 class GameConsumer(WebsocketConsumer):
@@ -24,7 +23,7 @@ class GameConsumer(WebsocketConsumer):
 
     def connect(self):
         self.room_group_name = 'game'
-
+        print(self.channel_name)
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
@@ -42,28 +41,28 @@ class GameConsumer(WebsocketConsumer):
 
     # Receive message from WebSocket
     def receive(self, text_data):
-        data, send_type = rout(text_data)
-        if send_type == 'send_all':
-            async_to_sync(self.channel_layer.group_send)(
-                self.room_group_name,
-                {
-                    'type': send_type,
-                    'data': data
-                }
-            )
-        if send_type == 'send_me':
-            self.send(text_data=json.dumps({
-                'type': send_type,
-                'data': data
-            }))
-
+        text_data_json = json.loads(text_data)
+        message = text_data_json
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': text_data_json['type'],
+                'message': message
+            }
+        )
     # Receive message from room group
-    def send_all(self, message):
+
+    def sendall(self, event):
+        print(event)
+        message = event['message']
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'type': 'message',
             'data': message
         }))
+
+    def get_games(self, _):
+        get_game_controller(self)
 
 
 class GameDetailConsumer(WebsocketConsumer):
@@ -91,7 +90,6 @@ class GameDetailConsumer(WebsocketConsumer):
         )
 
         self.accept()
-        print(self.scope)
 
     def disconnect(self, close_code):
         # Leave room group
@@ -115,10 +113,13 @@ class GameDetailConsumer(WebsocketConsumer):
 
     # Receive message from room group
     def chat_message(self, event):
+        print(event)
         message = event['message']
+
         # Send message to WebSocket
 
         self.send(text_data=json.dumps({
             'message': message
         }))
+
 
