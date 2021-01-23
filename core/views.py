@@ -1,8 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 
-from .models import  GameSetting, MainUser,  Transaction, Session
+from .models import GameSetting, MainUser, Transaction, Session, Player, Production, Warehouse
 from .serializers import GameSettingSerializer, MainUserDetailSerializer, \
-    TransactionSerializer, SessionSerializer
+    TransactionSerializer, SessionSerializer, PlayerSerializer, ProductionSerializer, WarehouseSerializer
 
 
 class GameSettingViewSet(ModelViewSet):
@@ -19,12 +19,34 @@ class SessionViewSet(ModelViewSet):
 
 
 class UserViewSet(ModelViewSet):
+    """Вывод пользвателей"""
     queryset = MainUser.objects.all()
     serializer_class = MainUserDetailSerializer
 
 
 class TransactionViewSet(ModelViewSet):
+    """Вывод транзакций"""
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
 
 
+class PlayerViewSet(ModelViewSet):
+    """Вывод игроков"""
+    queryset = Player.objects.all()
+    serializer_class = PlayerSerializer
+
+
+class ProductionViewSet(ModelViewSet):
+    # FIXME я хуй знает что сдесь написать
+    queryset = Production.objects.all()
+    serializer_class = ProductionSerializer
+
+
+class WarehouseViewSet(ModelViewSet):
+    """Вывод складов пользователей"""
+    queryset = Warehouse.objects.all()
+    serializer_class = WarehouseSerializer
+
+
+class TurnViewSet(ModelViewSet):
+    """Вывод шагов"""

@@ -24,7 +24,16 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from core.views import SessionViewSet
+from core.views import (SessionViewSet,
+                        GameSettingViewSet,
+                        UserViewSet,
+                        TransactionViewSet,
+                        PlayerViewSet,
+                        ProductionViewSet,
+                        ProductionViewSet,
+                        WarehouseViewSet,
+                        )
+
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -35,13 +44,19 @@ schema_view = get_schema_view(
       contact=openapi.Contact(email="contact@snippets.local"),
       license=openapi.License(name="BSD License"),
    ),
-   public=False,
+   public=True,
    permission_classes=(permissions.AllowAny,),
 )
 
 
 router = SimpleRouter()
 router.register(r'sesion', SessionViewSet)
+router.register(r'gamesettings', GameSettingViewSet)
+router.register(r'user', UserViewSet)
+router.register(r'transaction', TransactionViewSet)
+router.register(r'player', PlayerViewSet)
+router.register(r'production', ProductionViewSet)
+router.register(r'warehouse', WarehouseViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

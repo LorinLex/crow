@@ -77,7 +77,7 @@ class Player(models.Model):
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, related_name='player', null=True)
     city = models.CharField(max_length=10, choices=CITIES, verbose_name='Город', null=True)
     role = models.CharField(max_length=20, choices=ROLES, verbose_name='Игровая роль', null=True)
-    balance = models.IntegerField()
+    balance = models.IntegerField(default=0)
     is_bankrupt = models.BooleanField()
 
     def __str__(self):
@@ -103,7 +103,9 @@ class Warehouse(models.Model):
     def __str__(self):
         return f'Склад игрока {self.player.nickname}'
 
+
 class Turn(models.Model):
+    # FIXME Димон ты заебал нахуй он нужен без связей
     """Модель хода"""
     turn_time = models.IntegerField(verbose_name='Время хода', blank=True, default='')
 
