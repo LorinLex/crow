@@ -133,7 +133,16 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
 }
-
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:8080",
+    "http://localhost:8081",
+    "http://localhost:3000",
+    "http://localhost:3030",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:1313",
+    "http://localhost:1313",
+    "http://164.90.190.249"
+]
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
