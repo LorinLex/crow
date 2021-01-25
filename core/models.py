@@ -17,7 +17,6 @@ CITIES = (
     ('AD', "Алендор"),
     ('ET', "Этруа"),)
 
-# FIXME Нужно проработать статусы лобби
 SESSION_STATUS = (
     ('Created', "Сессия создана"),
     ('Filled', "Сессия заполнена"),
@@ -76,6 +75,7 @@ class Session(models.Model):
 
 
 class State(models.Model):
+    """Модель состояния игровой сессии"""
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='state')
     turn = models.PositiveIntegerField()
     game_state = models.TextField()  # JSONField
@@ -116,6 +116,7 @@ class Player(models.Model):
 
 
 class Production(models.Model):
+    """Модель запроса на производство"""
     manufacturer = models.ForeignKey(Player,
                                      on_delete=models.SET_NULL,
                                      null=True,
@@ -132,6 +133,7 @@ class Production(models.Model):
 
 
 class Warehouse(models.Model):
+    """Модель склада производителей"""
     player = models.ForeignKey(Player,
                                on_delete=models.SET_NULL,
                                null=True,
