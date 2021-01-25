@@ -4,7 +4,7 @@ from collections import defaultdict
 import weakref
 import json
 
-from .services.websocket_services.controllers import get_game_controller
+from .services.websocket_services.controllers import get_session_controller
 
 
 class GameConsumer(WebsocketConsumer):
@@ -23,7 +23,6 @@ class GameConsumer(WebsocketConsumer):
 
     def connect(self):
         self.room_group_name = 'game'
-        print(self.channel_name)
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
@@ -41,6 +40,7 @@ class GameConsumer(WebsocketConsumer):
 
     # Receive message from WebSocket
     def receive(self, text_data):
+        print(text_data)
         text_data_json = json.loads(text_data)
         message = text_data_json
         async_to_sync(self.channel_layer.group_send)(
@@ -53,7 +53,6 @@ class GameConsumer(WebsocketConsumer):
     # Receive message from room group
 
     def sendall(self, event):
-        print(event)
         message = event['message']
         # Send message to WebSocket
         self.send(text_data=json.dumps({
@@ -62,7 +61,7 @@ class GameConsumer(WebsocketConsumer):
         }))
 
     def get_games(self, _):
-        get_game_controller(self)
+        get_session_controller(self)
 
 
 class GameDetailConsumer(WebsocketConsumer):

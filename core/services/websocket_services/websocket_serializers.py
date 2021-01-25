@@ -6,7 +6,7 @@ from ...models import Session, GameSetting
 class WSGameSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameSetting
-        fields = ('crow_balance', )
+        fields = ('crown_balance', )
 
 
 class WSSessionSerializer(serializers.ModelSerializer):

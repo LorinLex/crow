@@ -50,3 +50,5 @@ class WarehouseViewSet(ModelViewSet):
 
 class TurnViewSet(ModelViewSet):
     """Вывод шагов"""
+    # FIXME ждем исправлений от Димона
+    pass

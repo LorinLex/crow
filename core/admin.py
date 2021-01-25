@@ -10,4 +10,3 @@ admin.site.register(Player)
 admin.site.register(Production)
 admin.site.register(Turn)
 
-admin.site.register(Player)
