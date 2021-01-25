@@ -88,7 +88,7 @@ class Player(models.Model):
     user = models.ForeignKey(MainUser, on_delete=models.CASCADE, related_name='player')
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, related_name='player', null=True)
     city = models.CharField(max_length=10, choices=CITIES, verbose_name='Город', null=True)
-    role = models.CharField(max_length=20, choices=ROLES, verbose_name='Игровая роль', null=True)
+    role = models.CharField(max_length=20, choices=ROLES, verbose_name='Игровая роль', blank=True, default='')
     balance = models.IntegerField(default=0)
     is_bankrupt = models.BooleanField()
 
@@ -102,11 +102,13 @@ class Player(models.Model):
     def save(self, *args, **kwargs):
         send = False
         if self.session.status == 'Created':
-            send = True
-            if self.role == 'broker':
-                self.balance = self.session.settings.broker_balance
+            if not self.role:
+                send = True
             else:
-                self.balance = self.session.settings.manufacturer_balance
+                if self.role == 'broker':
+                    self.balance = self.session.settings.broker_balance
+                else:
+                    self.balance = self.session.settings.manufacturer_balance
         super().save(*args, **kwargs)
         if send:
             send_sok_get_games()
