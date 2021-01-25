@@ -7,8 +7,8 @@
 Сделки, использованные в пересчёте, должны быть взяты только для i-го хода.
 """
 
-# from .dummie_manufacturers import manufacturers
 from ..models import Player
+from . import broker_services
 
 
 class InvalidBilletAmountException(Exception):
@@ -78,14 +78,15 @@ def count_costs_negotiation(number_of_transactions):
 
 
 current_session = 1
+# TODO Добавить session_id в фильтр
 manufacturers = Player.objects.filter(role='manufacturer', is_bankrupt=False)
-print(manufacturers)
 
 for manufacturer in manufacturers:
 
     billets_produced = manufacturer.production.get().billets_produced
-    billets_stored = manufacturer.warehouse.first().billets
-    transactions = manufacturer.transaction_m.all()
+    warehousing = manufacturer.warehouse.first()
+    billets_stored = warehousing.billets
+    transactions = manufacturer.transaction_m.filter(approved_by_broker=True)
     transaction_count = transactions.count()
 
     costs_fixed = count_costs_fixed(billets_produced)
@@ -151,10 +152,13 @@ for manufacturer in manufacturers:
         continue
 
     manufacturer.balance = balance_update_4
-    manufacturer.warehouse.first().billets = billets_left
+    warehousing.billets = billets_left
 
     manufacturer.save()
-    manufacturer.warehouse.first().save()
-    print(f'Сделки Игрока {manufacturer["nickname"]} совершены успешно!. '
-          f'Баланс на начало следующего хода равен {manufacturer["balance"]} песо. '
-          f'На складе осталось {manufacturer["warehouse"]["billets"]} заготовок')
+    warehousing.save()
+
+    print(f'Сделки Игрока {manufacturer.nickname} совершены успешно!. '
+          f'Баланс на начало следующего хода равен {manufacturer.balance} песо. '
+          f'На складе осталось {warehousing.billets} заготовок')
+
+# from core.services import services

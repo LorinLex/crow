@@ -72,7 +72,7 @@ class Session(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        send_sok_get_games()
+        # send_sok_get_games()
 
 
 class State(models.Model):
@@ -111,8 +111,8 @@ class Player(models.Model):
                 else:
                     self.balance = self.session.settings.manufacturer_balance
         super().save(*args, **kwargs)
-        if send:
-            send_sok_get_games()
+        # if send:
+        #     send_sok_get_games()
 
 
 class Production(models.Model):
