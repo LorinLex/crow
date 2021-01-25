@@ -1,3 +1,5 @@
+from .dummie_transactions import *
+
 broker_1 = {
     'nickname': 'i_kstati',
     'user': 'test_user_7',
@@ -5,6 +7,7 @@ broker_1 = {
     'city': 'NF',
     'role': 'broker',
     'balance': 8000,
+    'transactions': [transaction_1, transaction_4, transaction_7],
     'is_bankrupt': False,
 }
 
@@ -14,6 +17,7 @@ broker_2 = {
     'session': 'Dummie Session',
     'city': 'TT',
     'role': 'broker',
+    'transactions': [transaction_2, transaction_5],
     'balance': 8000,
     'is_bankrupt': False,
 }
@@ -24,6 +28,7 @@ broker_3 = {
     'session': 'Dummie Session',
     'city': 'WS',
     'role': 'broker',
+    'transactions': [transaction_3, transaction_6],
     'balance': 8000,
     'is_bankrupt': False,
 }

@@ -1,7 +1,4 @@
-from .dummie_brokers import brokers
-
 transaction_1 = {
-    'broker': brokers[0],
     'number_of_billets': 10,
     'turn': 1,
     'billet_price': 150,
@@ -10,7 +7,6 @@ transaction_1 = {
 }
 
 transaction_2 = {
-    'broker': brokers[1],
     'number_of_billets': 10,
     'turn': 1,
     'billet_price': 100,
@@ -19,7 +15,6 @@ transaction_2 = {
 }
 
 transaction_3 = {
-    'broker': brokers[2],
     'number_of_billets': 13,
     'turn': 1,
     'billet_price': 160,
@@ -28,7 +23,6 @@ transaction_3 = {
 }
 
 transaction_4 = {
-    'broker': brokers[0],
     'number_of_billets': 10,
     'turn': 1,
     'billet_price': 228,
@@ -37,7 +31,6 @@ transaction_4 = {
 }
 
 transaction_5 = {
-    'broker': brokers[1],
     'number_of_billets': 3,
     'turn': 1,
     'billet_price': 222,
@@ -46,7 +39,6 @@ transaction_5 = {
 }
 
 transaction_6 = {
-    'broker': brokers[2],
     'number_of_billets': 5,
     'turn': 1,
     'billet_price': 200,
@@ -55,7 +47,6 @@ transaction_6 = {
 }
 
 transaction_7 = {
-    'broker': brokers[0],
     'number_of_billets': 100,
     'turn': 1,
     'billet_price': 50,
@@ -63,3 +54,4 @@ transaction_7 = {
     'approved': True
 }
 
+transactions = [transaction_1, transaction_2, transaction_3, transaction_4, transaction_5, transaction_6, transaction_7]
