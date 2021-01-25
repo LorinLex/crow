@@ -20,7 +20,6 @@ CITIES = (
 # FIXME Нужно проработать статусы лобби
 SESSION_STATUS = (
     ('Created', "Сессия создана"),
-    ('Awaiting', "Ожидание подключения игроков"),
     ('Filled', "Сессия заполнена"),
 )
 
@@ -61,6 +60,7 @@ class Session(models.Model):
     turn_count = models.IntegerField(verbose_name='Количество игровых ходов')
     settings = models.ForeignKey(GameSetting, related_name='session', on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=100, choices=SESSION_STATUS, verbose_name='Статус сессии')
+    crown_balance = models.IntegerField(default=12000, verbose_name='Баланс Короны')
     is_started = models.BooleanField()
 
     def __str__(self):
@@ -72,13 +72,13 @@ class Session(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        send_sok_get_games()
+        # send_sok_get_games()
 
 
 class State(models.Model):
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='state')
     turn = models.PositiveIntegerField()
-    game_state = models.JSONField()
+    game_state = models.TextField()  # JSONField
 
 
 class Player(models.Model):
@@ -91,6 +91,7 @@ class Player(models.Model):
     role = models.CharField(max_length=20, choices=ROLES, verbose_name='Игровая роль', blank=True, default='')
     balance = models.IntegerField(default=0)
     is_bankrupt = models.BooleanField()
+    turn_finished = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.nickname} в городе {self.city}'
@@ -110,16 +111,20 @@ class Player(models.Model):
                 else:
                     self.balance = self.session.settings.manufacturer_balance
         super().save(*args, **kwargs)
-        if send:
-            send_sok_get_games()
+        # if send:
+        #     send_sok_get_games()
 
 
 class Production(models.Model):
-    manufacturer = models.ForeignKey(Player, on_delete=models.SET_NULL, null=True, related_name='production')
+    manufacturer = models.ForeignKey(Player,
+                                     on_delete=models.SET_NULL,
+                                     null=True,
+                                     related_name='production',
+                                     limit_choices_to={'role': 'manufacturer'})
     billets_produced = models.IntegerField()
 
     def __str__(self):
-        return f'Запрос на производство игрока {self.manufacturer.nickname}'
+        return f'Запрос на производство игрока {self.manufacturer}'
 
     class Meta:
         verbose_name = 'Запрос на производство'
@@ -127,15 +132,15 @@ class Production(models.Model):
 
 
 class Warehouse(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.SET_NULL, null=True, related_name='warehouse')
-    billets = models.IntegerField()
+    player = models.ForeignKey(Player, on_delete=models.SET_NULL, null=True, related_name='warehouse',
+                               limit_choices_to={'role': 'manufacturer'})
+    billets = models.IntegerField(default=0)
 
     def __str__(self):
-        return f'Склад игрока {self.player.nickname}'
+        return f'Склад игрока {self.player}'
 
 
 class Turn(models.Model):
-    # FIXME Димон ты заебал нахуй он нужен без связей
     """Модель хода"""
     turn_time = models.IntegerField(verbose_name='Время хода', blank=True, default='')
 
@@ -149,12 +154,15 @@ class Turn(models.Model):
 
 class Transaction(models.Model):
     """Модель транзакции"""
-    manufacturer = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='transaction_m')
-    broker = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='transaction_b')
+    manufacturer = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='transaction_m',
+                                     limit_choices_to={'role': 'manufacturer'})
+    broker = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='transaction_b',
+                               limit_choices_to={'role': 'broker'})
     number_of_billets = models.IntegerField(verbose_name='Количество')
     billet_price = models.IntegerField(verbose_name="Цена за заготовку")
     costs_transporting_single = models.PositiveIntegerField(default=10)
     approved_by_broker = models.BooleanField(default=False)
+    # FIXME Поменял ссылку на номер хода с отдельной модели на ссылку статуса сессии
     turn = models.ForeignKey(Turn, on_delete=models.CASCADE, related_name='transaction', default='')
 
     def __str__(self):
