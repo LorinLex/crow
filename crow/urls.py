@@ -50,7 +50,7 @@ schema_view = get_schema_view(
 
 
 router = SimpleRouter()
-router.register(r'sesion', SessionViewSet)
+router.register(r'session', SessionViewSet)
 router.register(r'gamesettings', GameSettingViewSet)
 router.register(r'user', UserViewSet)
 router.register(r'transaction', TransactionViewSet)

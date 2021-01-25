@@ -1,5 +1,13 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+
+def send_sok_get_games():
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)("game", {"type": "get_games"})
+
 
 CITIES = (
     ('NF', "Неверфол"),
@@ -62,6 +70,10 @@ class Session(models.Model):
         verbose_name = 'Игровая сессия'
         verbose_name_plural = 'Игровые сессии'
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        send_sok_get_games()
+
 
 class State(models.Model):
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='state')
@@ -76,7 +88,7 @@ class Player(models.Model):
     user = models.ForeignKey(MainUser, on_delete=models.CASCADE, related_name='player')
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, related_name='player', null=True)
     city = models.CharField(max_length=10, choices=CITIES, verbose_name='Город', null=True)
-    role = models.CharField(max_length=20, choices=ROLES, verbose_name='Игровая роль', null=True)
+    role = models.CharField(max_length=20, choices=ROLES, verbose_name='Игровая роль', blank=True, default='')
     balance = models.IntegerField(default=0)
     is_bankrupt = models.BooleanField()
     turn_finished = models.BooleanField(default=False)
@@ -87,6 +99,20 @@ class Player(models.Model):
     class Meta:
         verbose_name = 'Игрок'
         verbose_name_plural = 'Игроки'
+
+    def save(self, *args, **kwargs):
+        send = False
+        if self.session.status == 'Created':
+            if not self.role:
+                send = True
+            else:
+                if self.role == 'broker':
+                    self.balance = self.session.settings.broker_balance
+                else:
+                    self.balance = self.session.settings.manufacturer_balance
+        super().save(*args, **kwargs)
+        if send:
+            send_sok_get_games()
 
 
 class Production(models.Model):

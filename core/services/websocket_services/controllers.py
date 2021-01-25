@@ -16,7 +16,7 @@ def websocket_send_message(message_type: str = None, message: str = None, socket
 
 def get_session_controller(obj: object):
     queryset = Session.objects.exclude(status='Filled').annotate(players_quantity=models.Count('player'))
-    data = json.dumps(WSSessionSerializer(queryset, many=True).data)
+    data = WSSessionSerializer(queryset, many=True).data
     obj.send(
         text_data=json.dumps({
             'data': data
