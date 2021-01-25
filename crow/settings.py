@@ -134,7 +134,7 @@ REST_FRAMEWORK = {
     ),
 }
 CORS_ORIGIN_WHITELIST = [
-    "http://localhost:8080",
+    "http://localhost",
     "http://localhost:8081",
     "http://localhost:3000",
     "http://localhost:3030",
