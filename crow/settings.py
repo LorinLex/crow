@@ -49,6 +49,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -56,8 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
+
 ]
 
 ROOT_URLCONF = 'crow.urls'
@@ -135,6 +136,7 @@ REST_FRAMEWORK = {
 }
 CORS_ORIGIN_WHITELIST = [
     "http://localhost",
+    "http://192.168.0.102",
     "http://localhost:8081",
     "http://localhost:3000",
     "http://localhost:3030",
@@ -143,6 +145,11 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:1313",
     "http://164.90.190.249"
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://192.168.0.102",
+]
+
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
