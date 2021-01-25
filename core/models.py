@@ -1,5 +1,13 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+
+def send_sok_get_games():
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)("game", {"type": "get_games"})
+
 
 CITIES = (
     ('NF', "Неверфол"),
@@ -62,6 +70,10 @@ class Session(models.Model):
         verbose_name = 'Игровая сессия'
         verbose_name_plural = 'Игровые сессии'
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        send_sok_get_games()
+
 
 class State(models.Model):
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='state')
@@ -86,6 +98,18 @@ class Player(models.Model):
     class Meta:
         verbose_name = 'Игрок'
         verbose_name_plural = 'Игроки'
+
+    def save(self, *args, **kwargs):
+        send = False
+        if self.session.status == 'Created':
+            send = True
+            if self.role == 'broker':
+                self.balance = self.session.settings.broker_balance
+            else:
+                self.balance = self.session.settings.manufacturer_balance
+        super().save(*args, **kwargs)
+        if send:
+            send_sok_get_games()
 
 
 class Production(models.Model):
