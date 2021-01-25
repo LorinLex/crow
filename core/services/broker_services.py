@@ -13,7 +13,10 @@ for transaction in market_transactions:
 
 crown_balance = 12000
 
-market_billet_price = int(crown_balance / market_billets_count)
+try:
+    market_billet_price = int(crown_balance / market_billets_count)
+except ZeroDivisionError:
+    market_billet_price = 160
 
 for broker in brokers:
 
