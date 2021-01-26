@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'channels',
     'corsheaders',
     'djoser',
+    'countdowntimer-model',
 
     'core',
 ]

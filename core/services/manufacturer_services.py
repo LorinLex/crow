@@ -1,8 +1,5 @@
 """
-Модуль производит пересчёт баланса производителей с учётом совершённых сделок и товаров на складе.
-! В пересчёте участвуют не обанкротившиеся производители - нужно фильтровать с помощью запросов к БД
-
-Нужно каким-то образом учитывать ограничение на сумму сделки.
+Лимит сделки должнен учитываться только при одобрении сделки маклером.
 
 Сделки, использованные в пересчёте, должны быть взяты только для i-го хода.
 """
@@ -76,19 +73,22 @@ def count_costs_negotiation(number_of_transactions):
     return number_of_transactions * costs_negotiation_single
 
 
-def count_manufacturers():
-    """Функция просчитывает игровые параметры для производителей и записывает новые данные в БД"""
+def count_manufacturers(session_id: int, turn_id: int):
+    """
+    Функция просчитывает игровые параметры для производителей и записывает новые параметры в БД.
+    :param session_id: id игровой сессии
+    :param turn_id: id хода. необходим для учёта транзакций только на текущем ходу
+    :return: обновляет игровые параметры производителей
+    """
 
-    current_session = 1
-    # TODO Добавить session_id в фильтр
-    manufacturers = Player.objects.filter(role='manufacturer', is_bankrupt=False)
+    manufacturers = Player.objects.filter(session_id=session_id, role='manufacturer', is_bankrupt=False)
 
     for manufacturer in manufacturers:
 
         billets_produced = manufacturer.production.get().billets_produced
         warehousing = manufacturer.warehouse.first()
         billets_stored = warehousing.billets
-        transactions = manufacturer.transaction_m.filter(approved_by_broker=True)
+        transactions = manufacturer.transaction_m.filter(turn_id=turn_id, approved_by_broker=True)
         transaction_count = transactions.count()
 
         costs_fixed = count_costs_fixed(billets_produced)
@@ -162,5 +162,3 @@ def count_manufacturers():
         print(f'Сделки Игрока {manufacturer.nickname} совершены успешно!. '
               f'Баланс на начало следующего хода равен {manufacturer.balance} песо. '
               f'На складе осталось {warehousing.billets} заготовок')
-
-    # from core.services import services

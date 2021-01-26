@@ -150,6 +150,9 @@ class Turn(models.Model):
     session = models.ForeignKey(Session, verbose_name='Сессия', on_delete=models.CASCADE)
     turn_time = models.PositiveIntegerField(verbose_name='Время хода', blank=True, default='')
 
+    # FIXME состакать с таймером
+    turn_finished = models.BooleanField(default=False)
+
     def __str__(self):
         return f'Ход № {self.pk}'
 
