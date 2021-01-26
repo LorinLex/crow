@@ -66,7 +66,7 @@ class Session(models.Model):
     settings = models.ForeignKey(GameSetting, related_name='session', on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=100, choices=SESSION_STATUS, verbose_name='Статус сессии')
     crown_balance = models.PositiveIntegerField(default=12000, verbose_name='Баланс Короны')
-    is_started = models.BooleanField()
+    is_started = models.BooleanField(default=False)
 
 
     def __str__(self):
