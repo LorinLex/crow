@@ -67,7 +67,7 @@ class Session(models.Model):
     settings = models.ForeignKey(GameSetting, related_name='session', on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=100, choices=SESSION_STATUS, verbose_name='Статус сессии', default='Created')
     crown_balance = models.PositiveIntegerField(default=12000, verbose_name='Баланс Короны')
-    is_started = models.BooleanField()
+    is_started = models.BooleanField(default=False)
 
 
     def __str__(self):
@@ -76,9 +76,20 @@ class Session(models.Model):
     class Meta:
         verbose_name = 'Игровая сессия'
         verbose_name_plural = 'Игровые сессии'
+    # TODO много логики в методе save!
+    # 1. При создании создаем шаги OK
+    # 2. При старте игры используем для подсчета первый шаг и каждый шаг это атоинкремент!
+    # 3. При завершении хода turn_finished в шаге в статус True
 
     def save(self, *args, **kwargs):
+        create_turn = True if not self.pk else False
         super().save(*args, **kwargs)
+        if create_turn:
+            for i in range(self.turn_count):
+                Turn.objects.create(
+                    turn_num=i+1,
+                    session=self
+                )
         send_sok_get_games()
         send_sok_change_session_id(self.pk)
 
@@ -160,14 +171,15 @@ class Warehouse(models.Model):
 
 class Turn(models.Model):
     """Модель хода"""
+    turn_num = models.IntegerField(verbose_name='Номер хода')
     session = models.ForeignKey(Session, verbose_name='Сессия', on_delete=models.CASCADE)
-    turn_time = models.PositiveIntegerField(verbose_name='Время хода', blank=True, default='')
+    turn_time = models.PositiveIntegerField(verbose_name='Время хода', blank=True, default=30)
 
     # FIXME состакать с таймером
     turn_finished = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'Ход № {self.pk}'
+        return f'Ход № {self.turn_num} Сессия №{self.session.id} {self.pk}'
 
     class Meta:
         verbose_name = 'Ход'
