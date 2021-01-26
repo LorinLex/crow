@@ -3,14 +3,17 @@ from ..models import Player, Transaction
 costs_fixed = 1000
 
 
-def count_brokers():
-    """Функция просчитывает игровые параметры маклеров и записывает новые параметры в БД"""
+def count_brokers(session_id: int, turn_id: int):
+    """
+    Функция просчитывает игровые параметры маклеров и записывает новые параметры в БД.
+    :param session_id: id игровой сессии
+    :param turn_id: номер игрового хода. параметр нужен для подсчёта рыночного объёма заготовок
+    :return: обновляет игровые параметры маклеров
+    """
 
     market_billets_count = 0
-    # FIXME Фильтровать по сессии и номеру хода
-    market_transactions = Transaction.objects.filter(turn_id=1)
-    # TODO Добавить session_id в фильтр
-    brokers = Player.objects.filter(role='broker', is_bankrupt=False)
+    market_transactions = Transaction.objects.filter(session_id=session_id, turn_id=turn_id)
+    brokers = Player.objects.filter(session_id=session_id, role='broker', is_bankrupt=False)
 
     for transaction in market_transactions:
         market_billets_count += transaction.number_of_billets
@@ -24,7 +27,7 @@ def count_brokers():
 
     for broker in brokers:
 
-        transactions = broker.transaction_b.filter(approved_by_broker=True)
+        transactions = broker.transaction_b.filter(turn_id=turn_id, approved_by_broker=True)
         costs_purchase = 0
         billets_bought = 0
 
@@ -54,6 +57,3 @@ def count_brokers():
         broker.save()
 
         print(f'Сделки брокера {broker.nickname} прошли успешно! Баланс на следующий ход: {broker.balance}')
-
-
-    # from core.services import services
