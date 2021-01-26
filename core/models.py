@@ -61,12 +61,13 @@ class GameSetting(models.Model):
 
 class Session(models.Model):
     """Модель игровой сессии"""
+
     name = models.CharField(max_length=255, verbose_name='Название сессии')
     turn_count = models.PositiveIntegerField(verbose_name='Количество игровых ходов')
     settings = models.ForeignKey(GameSetting, related_name='session', on_delete=models.SET_NULL, null=True)
-    status = models.CharField(max_length=100, choices=SESSION_STATUS, verbose_name='Статус сессии')
+    status = models.CharField(max_length=100, choices=SESSION_STATUS, verbose_name='Статус сессии', default='Created')
     crown_balance = models.PositiveIntegerField(default=12000, verbose_name='Баланс Короны')
-    is_started = models.BooleanField(default=False)
+    is_started = models.BooleanField()
 
 
     def __str__(self):
@@ -162,12 +163,23 @@ class Turn(models.Model):
     session = models.ForeignKey(Session, verbose_name='Сессия', on_delete=models.CASCADE)
     turn_time = models.PositiveIntegerField(verbose_name='Время хода', blank=True, default='')
 
+    # FIXME состакать с таймером
+    turn_finished = models.BooleanField(default=False)
+
     def __str__(self):
         return f'Ход № {self.pk}'
 
     class Meta:
         verbose_name = 'Ход'
         verbose_name_plural = 'Ходы'
+    
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            orig = Turn.objects.get(pk=self.pk)
+            if not orig.turn_finished:
+                # FIXME Нужно доставать время следующего хода из пресетов
+                Turn.objects.create(session=self.session, turn_time=10)
+        super(Turn, self).save(*args, **kwargs)
 
 
 class Transaction(models.Model):
