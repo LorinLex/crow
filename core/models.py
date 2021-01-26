@@ -6,7 +6,13 @@ from asgiref.sync import async_to_sync
 
 def send_sok_get_games():
     channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)("game", {"type": "get_games"})
+    async_to_sync(channel_layer.group_send)("game", {"type": "send_game_data"})
+
+
+def send_sok_change_session_id(session_id):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(f"session_{session_id}", {"type": "send_detail_data", 'pk': f'{session_id}'})
+
 
 
 CITIES = (
@@ -62,6 +68,7 @@ class Session(models.Model):
     crown_balance = models.PositiveIntegerField(default=12000, verbose_name='Баланс Короны')
     is_started = models.BooleanField()
 
+
     def __str__(self):
         return f'Сессия "{self.name}"'
 
@@ -71,7 +78,12 @@ class Session(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # send_sok_get_games()
+        send_sok_get_games()
+        send_sok_change_session_id(self.pk)
+
+    def delete(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        send_sok_get_games()
 
 
 class State(models.Model):
@@ -90,7 +102,7 @@ class Player(models.Model):
     city = models.CharField(max_length=10, choices=CITIES, verbose_name='Город', null=True)
     role = models.CharField(max_length=20, choices=ROLES, verbose_name='Игровая роль', blank=True, default='')
     balance = models.IntegerField(default=0)
-    is_bankrupt = models.BooleanField()
+    is_bankrupt = models.BooleanField(default=False)
     turn_finished = models.BooleanField(default=False)
 
     def __str__(self):
@@ -111,8 +123,8 @@ class Player(models.Model):
                 else:
                     self.balance = self.session.settings.manufacturer_balance
         super().save(*args, **kwargs)
-        # if send:
-        #     send_sok_get_games()
+        if send:
+            send_sok_get_games()
 
 
 class Production(models.Model):
@@ -180,3 +192,8 @@ class Transaction(models.Model):
     class Meta:
         verbose_name = 'Сделка'
         verbose_name_plural = 'Сделки'
+
+
+class UserWebSocket(models.Model):
+    user = models.ForeignKey(MainUser, on_delete=models.CASCADE)
+    channel_name = models.CharField(max_length=255)
