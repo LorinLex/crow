@@ -39,14 +39,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
     'drf_yasg',
     'channels',
     'corsheaders',
-
+    'djoser',
     'core',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -54,8 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
+
 ]
 
 ROOT_URLCONF = 'crow.urls'
@@ -121,13 +123,40 @@ CHANNEL_LAYERS = {
 }
 
 REST_FRAMEWORK = {
+
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
 }
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost",
+    'http://192.168.0.100',
+    "http://192.168.0.102",
+    "http://localhost:8081",
+    "http://localhost:3000",
+    "http://localhost:3030",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:1313",
+    "http://localhost:1313",
+    "http://164.90.190.249"
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://192.168.0.102",
+]
+
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': False,
+    'SERIALIZERS': {},
+}
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 

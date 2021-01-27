@@ -1,40 +1,54 @@
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Game, Profile, GameSetting, MainUser, City, Transaction, Step
-from .serializers import GameSerializer, GameSettingSerializer, \
-    ProfileDetailSerializer, MainUserDetailSerializer, CitySerializer, TransactionSerializer, StepSerializer
-
-
-class GameViewSet(ModelViewSet):
-    queryset = Game.objects.all()
-    serializer_class = GameSerializer
+from .models import GameSetting, MainUser, Transaction, Session, Player, Production, Warehouse
+from .serializers import GameSettingSerializer, MainUserDetailSerializer, \
+    TransactionSerializer, SessionSerializer, PlayerSerializer, ProductionSerializer, WarehouseSerializer
 
 
 class GameSettingViewSet(ModelViewSet):
+    """Вывод настроек игры"""
+    # FIXME посмотреть get serializer
     queryset = GameSetting.objects.all()
     serializer_class = GameSettingSerializer
 
 
-class ProfileViewSet(ModelViewSet):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileDetailSerializer
+class SessionViewSet(ModelViewSet):
+    """Вывод игровых ссесий"""
+    queryset = Session.objects.exclude(status='Filled')
+    serializer_class = SessionSerializer
 
 
 class UserViewSet(ModelViewSet):
+    """Вывод пользвателей"""
     queryset = MainUser.objects.all()
     serializer_class = MainUserDetailSerializer
 
 
-class CityViewSet(ModelViewSet):
-    queryset = City.objects.all()
-    serializer_class = CitySerializer
-
-
 class TransactionViewSet(ModelViewSet):
+    """Вывод транзакций"""
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
 
 
-class StepViewSet(ModelViewSet):
-    queryset = Step.objects.all()
-    serializer_class = StepSerializer
+class PlayerViewSet(ModelViewSet):
+    """Вывод игроков"""
+    queryset = Player.objects.all()
+    serializer_class = PlayerSerializer
+
+
+class ProductionViewSet(ModelViewSet):
+    # FIXME я хуй знает что сдесь написать
+    queryset = Production.objects.all()
+    serializer_class = ProductionSerializer
+
+
+class WarehouseViewSet(ModelViewSet):
+    """Вывод складов пользователей"""
+    queryset = Warehouse.objects.all()
+    serializer_class = WarehouseSerializer
+
+
+class TurnViewSet(ModelViewSet):
+    """Вывод шагов"""
+    # FIXME ждем исправлений от Димона
+    pass

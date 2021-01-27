@@ -1,11 +1,14 @@
 from django.contrib import admin
 
-from .models import Profile, City, MainUser, GameSetting, Transaction, Step, Game
+from .models import MainUser, GameSetting, Transaction, Session, Player, Production, Turn, Warehouse, UserWebSocket
 
 admin.site.register(MainUser)
-admin.site.register(City)
-admin.site.register(Profile)
 admin.site.register(GameSetting)
 admin.site.register(Transaction)
-admin.site.register(Step)
-admin.site.register(Game)
+admin.site.register(Session)
+admin.site.register(Player)
+admin.site.register(Production)
+admin.site.register(Turn)
+admin.site.register(Warehouse)
+admin.site.register(UserWebSocket)
+
